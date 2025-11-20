@@ -1,217 +1,388 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
+
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>背诵任务打卡互动界面</title>
     <style>
-      :root { --bg:#f5f1d9; --panel:#eef5d6; --title:#111; --red:#c62828; --accent:#5c6bc0; --cols:7; --size:68px; --min-gap:10px; }
-      * { box-sizing: border-box; }
-      html, body { height: 100%; }
-      body { margin: 0; overflow-x: hidden; background: radial-gradient(ellipse at top, #f7f3e5 0%, #ede8cf 40%, #e6e1bd 100%); font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, -apple-system, sans-serif; color: var(--title); }
-      .wrap { width: 100%; margin: 0 auto; padding: 16px; }
-      header { position: relative; display: flex; align-items: center; justify-content: center; padding: 16px 0 8px; }
-      header h1 { font-size: clamp(24px, 4vw, 48px); font-weight: 800; letter-spacing: 2px; color: var(--title); text-align: center; }
-      .pig-left, .pig-right { position: absolute; top: 4px; width: clamp(60px, 10vw, 100px); height: auto; }
-      .pig-left { left: 12px; }
-      .pig-right { right: 12px; }
+        :root {
+            --bg: #f5f1d9;
+            --panel: #eef5d6;
+            --title: #111;
+            --red: #c62828;
+            --accent: #5c6bc0;
+            --cols: 7;
+            --size: 64px;
+            --min-gap: 6px;
+        }
 
-      .content { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; }
-      .panel { background: var(--bg); border-radius: 24px; border: 4px solid #d7d2ae; padding: 12px 16px 20px; min-height: 55vh; position: relative; }
-      .panel::after { content:""; position:absolute; inset:0; border-radius:24px; box-shadow: inset 0 8px 24px rgba(0,0,0,0.08); pointer-events:none; }
-      .panel h2 { margin: 6px 0 12px; text-align: center; color: var(--red); font-size: clamp(18px, 3vw, 30px); font-weight: 800; letter-spacing: 2px; }
-      .grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 12px var(--min-gap); align-items: start; }
-      .slot { min-height: calc(var(--size) + 42px); display: flex; align-items: flex-start; justify-content: center; }
+        * {
+            box-sizing: border-box;
+        }
 
-      .student { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 6px; border-radius: 16px; transition: transform .2s ease, box-shadow .2s ease; user-select: none; cursor: pointer; }
-      .student:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
-      .avatar { width: var(--size); height: var(--size); border-radius: 50%; background: #fff; display: grid; place-items: center; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
-      .avatar img { width: 100%; height: 100%; object-fit: contain; }
-      .name { font-size: clamp(12px, calc(var(--size) / 4.8), 16px); font-weight: 700; color: #333; text-align: center; }
+        html,
+        body {
+            height: 100%;
+        }
 
-      .empty { opacity: .5; text-align: center; padding: 24px; font-size: 14px; }
+        body {
+            margin: 0;
+            overflow-x: hidden;
+            background: radial-gradient(ellipse at top, #f7f3e5 0%, #ede8cf 40%, #e6e1bd 100%);
+            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+            color: var(--title);
+        }
 
-      .fly-clone { position: fixed; z-index: 9999; pointer-events: none; will-change: transform; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.25)); }
-      .pulse { animation: pulse .9s ease-in-out infinite; }
-      @keyframes pulse { 0%{ transform: scale(1);} 50%{ transform: scale(1.08);} 100%{ transform: scale(1);} }
+        .wrap {
+            width: 100%;
+            margin: 0 auto;
+            padding: 16px;
+        }
 
-      @media (max-width: 860px) { .panel { min-height: auto; } :root { --cols: 5; --size: clamp(52px, 9vw, 68px); } }
+        header {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* padding: 16px 0 8px; */
+        }
+
+        header h1 {
+            font-size: clamp(24px, 4vw, 48px);
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--title);
+            text-align: center;
+        }
+
+        .pig-left,
+        .pig-right {
+            position: absolute;
+            top: 4px;
+            width: clamp(60px, 10vw, 100px);
+            height: auto;
+        }
+
+        .pig-left {
+            left: 12px;
+        }
+
+        .pig-right {
+            right: 12px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 16px;
+        }
+
+        .panel {
+            background: var(--bg);
+            border-radius: 24px;
+            border: 4px solid #d7d2ae;
+            padding: 12px 16px 20px;
+            min-height: 55vh;
+            position: relative;
+        }
+
+        .panel::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            box-shadow: inset 0 8px 24px rgba(0, 0, 0, 0.08);
+            pointer-events: none;
+        }
+
+        .panel h2 {
+            margin: 6px 0 12px;
+            text-align: center;
+            color: var(--red);
+            font-size: clamp(18px, 3vw, 30px);
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+            gap: 8px var(--min-gap);
+            align-items: start;
+        }
+
+        .slot {
+            min-height: calc(var(--size) + 28px);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .student {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 4px;
+            border-radius: 14px;
+            transition: transform .2s ease, box-shadow .2s ease;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .student:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+        }
+
+        .avatar {
+            width: var(--size);
+            height: var(--size);
+            border-radius: 50%;
+            background: #fff;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .name {
+            font-size: clamp(11px, calc(var(--size) / 5.6), 15px);
+            font-weight: 700;
+            color: #333;
+            text-align: center;
+        }
+
+        .empty {
+            opacity: .5;
+            text-align: center;
+            padding: 24px;
+            font-size: 14px;
+        }
+
+        .fly-clone {
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            will-change: transform;
+            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.25));
+        }
+
+        .pulse {
+            animation: pulse .9s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.08);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 860px) {
+            .panel {
+                min-height: auto;
+            }
+
+            :root {
+                --cols: 5;
+                --size: clamp(46px, 9vw, 64px);
+            }
+        }
     </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <header>
-        <img class="pig-left" alt="装饰" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><rect rx='20' width='120' height='120' fill='%23dbe7a1'/><g transform='translate(10,10)'><circle cx='50' cy='40' r='28' fill='%23f7a9a8'/><ellipse cx='50' cy='53' rx='20' ry='14' fill='%23f48f8e'/><circle cx='40' cy='40' r='6' fill='%23222'/><circle cx='60' cy='40' r='6' fill='%23222'/><rect x='18' y='70' width='64' height='30' rx='14' fill='%2380b1ff'/><rect x='0' y='80' width='18' height='12' rx='6' fill='%238d6e63'/><rect x='82' y='80' width='18' height='12' rx='6' fill='%238d6e63'/></g></svg>" />
-        <h1>完成背诵任务后 点击姓名打卡</h1>
-        <img class="pig-right" alt="装饰" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><rect rx='20' width='120' height='120' fill='%23dbe7a1'/><g transform='translate(10,10)'><circle cx='50' cy='40' r='28' fill='%23f7a9a8'/><ellipse cx='50' cy='53' rx='20' ry='14' fill='%23f48f8e'/><circle cx='40' cy='40' r='6' fill='%23222'/><circle cx='60' cy='40' r='6' fill='%23222'/><rect x='20' y='68' width='60' height='18' rx='9' fill='%2376d275'/><rect x='32' y='86' width='36' height='14' rx='7' fill='%238d6e63'/></g></svg>" />
-      </header>
+</head>
 
-      <div class="content">
-        <section class="panel" id="panel-left">
-          <h2>未过关同学</h2>
-          <div class="grid" id="grid-left"></div>
-        </section>
-        <section class="panel" id="panel-right">
-          <h2>已过关同学</h2>
-          <div class="grid" id="grid-right"></div>
-        </section>
-      </div>
+<body>
+    <div class="wrap">
+        <header>
+            <img class="pig-left" alt="装饰"
+                src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><rect rx='20' width='120' height='120' fill='%23dbe7a1'/><g transform='translate(10,10)'><circle cx='50' cy='40' r='28' fill='%23f7a9a8'/><ellipse cx='50' cy='53' rx='20' ry='14' fill='%23f48f8e'/><circle cx='40' cy='40' r='6' fill='%23222'/><circle cx='60' cy='40' r='6' fill='%23222'/><rect x='18' y='70' width='64' height='30' rx='14' fill='%2380b1ff'/><rect x='0' y='80' width='18' height='12' rx='6' fill='%238d6e63'/><rect x='82' y='80' width='18' height='12' rx='6' fill='%238d6e63'/></g></svg>" />
+            <h1>完成背诵任务后 点击姓名打卡</h1>
+            <img class="pig-right" alt="装饰"
+                src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'><rect rx='20' width='120' height='120' fill='%23dbe7a1'/><g transform='translate(10,10)'><circle cx='50' cy='40' r='28' fill='%23f7a9a8'/><ellipse cx='50' cy='53' rx='20' ry='14' fill='%23f48f8e'/><circle cx='40' cy='40' r='6' fill='%23222'/><circle cx='60' cy='40' r='6' fill='%23222'/><rect x='20' y='68' width='60' height='18' rx='9' fill='%2376d275'/><rect x='32' y='86' width='36' height='14' rx='7' fill='%238d6e63'/></g></svg>" />
+        </header>
+
+        <div class="content">
+            <section class="panel" id="panel-left">
+                <h2>未过关同学</h2>
+                <div class="grid" id="grid-left"></div>
+            </section>
+            <section class="panel" id="panel-right">
+                <h2>已过关同学</h2>
+                <div class="grid" id="grid-right"></div>
+            </section>
+        </div>
     </div>
 
     <script>
-      const avatarMap = {
-        pig: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(8,6)'><circle cx='32' cy='22' r='16' fill='%23ffa7a6'/><ellipse cx='32' cy='30' rx='12' ry='8' fill='%23f48f8e'/><circle cx='26' cy='22' r='3.5' fill='%23000'/><circle cx='38' cy='22' r='3.5' fill='%23000'/><rect x='14' y='44' width='36' height='18' rx='9' fill='%2380b1ff'/></g></svg>",
-        monkey: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(10,8)'><circle cx='30' cy='24' r='16' fill='%23a1887f'/><circle cx='18' cy='24' r='8' fill='%23bcaaa4'/><circle cx='42' cy='24' r='8' fill='%23bcaaa4'/><circle cx='26' cy='24' r='3.5'/><circle cx='34' cy='24' r='3.5'/><rect x='12' y='44' width='36' height='18' rx='9' fill='%23ffd54f'/></g></svg>",
-        king: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(8,6)'><circle cx='32' cy='26' r='16' fill='%23f06292'/><path d='M20 10 L24 4 L28 10 L32 4 L36 10 L40 4 L44 10 Z' fill='%23ffd54f'/><circle cx='28' cy='26' r='3.5'/><circle cx='36' cy='26' r='3.5'/><rect x='14' y='44' width='36' height='18' rx='9' fill='%2390caf9'/></g></svg>",
-        bear: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(8,6)'><circle cx='26' cy='18' r='6' fill='%236d4c41'/><circle cx='38' cy='18' r='6' fill='%236d4c41'/><circle cx='32' cy='26' r='16' fill='%238d6e63'/><circle cx='28' cy='26' r='3.5'/><circle cx='36' cy='26' r='3.5'/><rect x='14' y='44' width='36' height='18' rx='9' fill='%23a5d6a7'/></g></svg>",
-        cat: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(8,6)'><path d='M20 10 L28 6 L36 10 L44 6 L52 10 L52 20 L12 20 Z' fill='%23ce93d8'/><circle cx='32' cy='30' r='14' fill='%239c27b0'/><circle cx='28' cy='30' r='3.5'/><circle cx='36' cy='30' r='3.5'/><rect x='14' y='44' width='36' height='18' rx='9' fill='%23ffab91'/></g></svg>",
-        dog: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(8,8)'><rect x='20' y='8' width='24' height='12' rx='6' fill='%23bcaaa4'/><circle cx='32' cy='28' r='16' fill='%23a1887f'/><circle cx='28' cy='28' r='3.5'/><circle cx='36' cy='28' r='3.5'/><rect x='14' y='44' width='36' height='18' rx='9' fill='%23ffcc80'/></g></svg>",
-        frog: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(8,8)'><circle cx='24' cy='18' r='6' fill='%239ccc65'/><circle cx='40' cy='18' r='6' fill='%239ccc65'/><circle cx='32' cy='28' r='16' fill='%238bc34a'/><circle cx='28' cy='24' r='3.5'/><circle cx='36' cy='24' r='3.5'/><rect x='14' y='44' width='36' height='18' rx='9' fill='%23aed581'/></g></svg>"
-      };
+        const avatarMap = {
+            pig: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(8,6)'><circle cx='32' cy='22' r='16' fill='%23ffa7a6'/><ellipse cx='32' cy='30' rx='12' ry='8' fill='%23f48f8e'/><circle cx='26' cy='22' r='3.5' fill='%23000'/><circle cx='38' cy='22' r='3.5' fill='%23000'/><rect x='14' y='44' width='36' height='18' rx='9' fill='%2380b1ff'/></g></svg>",
+            monkey: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(10,8)'><circle cx='30' cy='24' r='16' fill='%23a1887f'/><circle cx='18' cy='24' r='8' fill='%23bcaaa4'/><circle cx='42' cy='24' r='8' fill='%23bcaaa4'/><circle cx='26' cy='24' r='3.5'/><circle cx='34' cy='24' r='3.5'/><rect x='12' y='44' width='36' height='18' rx='9' fill='%23ffd54f'/></g></svg>",
+            king: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(8,6)'><circle cx='32' cy='26' r='16' fill='%23f06292'/><path d='M20 10 L24 4 L28 10 L32 4 L36 10 L40 4 L44 10 Z' fill='%23ffd54f'/><circle cx='28' cy='26' r='3.5'/><circle cx='36' cy='26' r='3.5'/><rect x='14' y='44' width='36' height='18' rx='9' fill='%2390caf9'/></g></svg>",
+            bear: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(8,6)'><circle cx='26' cy='18' r='6' fill='%236d4c41'/><circle cx='38' cy='18' r='6' fill='%236d4c41'/><circle cx='32' cy='26' r='16' fill='%238d6e63'/><circle cx='28' cy='26' r='3.5'/><circle cx='36' cy='26' r='3.5'/><rect x='14' y='44' width='36' height='18' rx='9' fill='%23a5d6a7'/></g></svg>",
+            cat: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(8,6)'><path d='M20 10 L28 6 L36 10 L44 6 L52 10 L52 20 L12 20 Z' fill='%23ce93d8'/><circle cx='32' cy='30' r='14' fill='%239c27b0'/><circle cx='28' cy='30' r='3.5'/><circle cx='36' cy='30' r='3.5'/><rect x='14' y='44' width='36' height='18' rx='9' fill='%23ffab91'/></g></svg>",
+            dog: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(8,8)'><rect x='20' y='8' width='24' height='12' rx='6' fill='%23bcaaa4'/><circle cx='32' cy='28' r='16' fill='%23a1887f'/><circle cx='28' cy='28' r='3.5'/><circle cx='36' cy='28' r='3.5'/><rect x='14' y='44' width='36' height='18' rx='9' fill='%23ffcc80'/></g></svg>",
+            frog: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><rect rx='18' width='80' height='80' fill='%23fffbe6'/><g transform='translate(8,8)'><circle cx='24' cy='18' r='6' fill='%239ccc65'/><circle cx='40' cy='18' r='6' fill='%239ccc65'/><circle cx='32' cy='28' r='16' fill='%238bc34a'/><circle cx='28' cy='24' r='3.5'/><circle cx='36' cy='24' r='3.5'/><rect x='14' y='44' width='36' height='18' rx='9' fill='%23aed581'/></g></svg>"
+        };
 
-      const students = [
-        { name: "沈思瑶", avatar: "pig", status: "unpassed" },
-        { name: "毛鑫", avatar: "monkey", status: "unpassed" },
-        { name: "龚文涛", avatar: "dog", status: "unpassed" },
-        { name: "毛金龙", avatar: "bear", status: "unpassed" },
-        { name: "郭天齐", avatar: "cat", status: "unpassed" },
-        { name: "刘润琪", avatar: "frog", status: "unpassed" },
-        { name: "向明羽", avatar: "pig", status: "unpassed" },
-        { name: "韩乐乐", avatar: "monkey", status: "unpassed" },
-        { name: "夏岚", avatar: "cat", status: "unpassed" },
-        { name: "郭瑞峰", avatar: "dog", status: "unpassed" },
-        { name: "张泽洋", avatar: "bear", status: "unpassed" },
-        { name: "孙焕", avatar: "frog", status: "unpassed" },
-        { name: "张雨豪", avatar: "pig", status: "unpassed" },
-        { name: "张慧", avatar: "cat", status: "unpassed" },
-        { name: "齐维亮", avatar: "dog", status: "unpassed" },
-        { name: "苏文轩", avatar: "monkey", status: "unpassed" },
-        { name: "崔文源", avatar: "bear", status: "unpassed" },
-        { name: "许晨辉", avatar: "frog", status: "unpassed" },
-        { name: "韩耀轩", avatar: "pig", status: "unpassed" },
-        { name: "崔凯文", avatar: "dog", status: "unpassed" },
-        { name: "张镇影", avatar: "cat", status: "unpassed" },
-        { name: "周文博", avatar: "bear", status: "unpassed" },
-        { name: "江骏豪", avatar: "monkey", status: "unpassed" },
-        { name: "刘欣然", avatar: "frog", status: "unpassed" },
-        { name: "柴家慧", avatar: "pig", status: "unpassed" },
-        { name: "张奥博", avatar: "dog", status: "unpassed" },
-        { name: "赵明轩", avatar: "cat", status: "unpassed" },
-        { name: "江佩霖", avatar: "bear", status: "unpassed" },
-        { name: "毛丹丹", avatar: "frog", status: "unpassed" },
-        { name: "哈昕扬", avatar: "pig", status: "passed" },
-        { name: "张丹", avatar: "king", status: "passed" },
-        { name: "周金", avatar: "king", status: "passed" },
-        { name: "向伟", avatar: "king", status: "passed" },
-        { name: "朱秉月", avatar: "king", status: "passed" },
-        { name: "刘耀冉", avatar: "king", status: "passed" },
-        { name: "皮臻琳", avatar: "frog", status: "passed" },
-        { name: "张梦瑶", avatar: "cat", status: "passed" }
-      ].map((s, i) => ({ id: i + 1, ...s }));
+        const students = [
+            { name: "沈思瑶", avatar: "pig", status: "unpassed" },
+            { name: "毛鑫", avatar: "monkey", status: "unpassed" },
+            { name: "龚文涛", avatar: "dog", status: "unpassed" },
+            { name: "毛金龙", avatar: "bear", status: "unpassed" },
+            { name: "郭天齐", avatar: "cat", status: "unpassed" },
+            { name: "刘润琪", avatar: "frog", status: "unpassed" },
+            { name: "向明羽", avatar: "pig", status: "unpassed" },
+            { name: "韩乐乐", avatar: "monkey", status: "unpassed" },
+            { name: "夏岚", avatar: "cat", status: "unpassed" },
+            { name: "郭瑞峰", avatar: "dog", status: "unpassed" },
+            { name: "张泽洋", avatar: "bear", status: "unpassed" },
+            { name: "孙焕", avatar: "frog", status: "unpassed" },
+            { name: "张雨豪", avatar: "pig", status: "unpassed" },
+            { name: "张慧", avatar: "cat", status: "unpassed" },
+            { name: "齐维亮", avatar: "dog", status: "unpassed" },
+            { name: "苏文轩", avatar: "monkey", status: "unpassed" },
+            { name: "崔文源", avatar: "bear", status: "unpassed" },
+            { name: "许晨辉", avatar: "frog", status: "unpassed" },
+            { name: "韩耀轩", avatar: "pig", status: "unpassed" },
+            { name: "崔凯文", avatar: "dog", status: "unpassed" },
+            { name: "张镇影", avatar: "cat", status: "unpassed" },
+            { name: "周文博", avatar: "bear", status: "unpassed" },
+            { name: "江骏豪", avatar: "monkey", status: "unpassed" },
+            { name: "刘欣然", avatar: "frog", status: "unpassed" },
+            { name: "柴家慧", avatar: "pig", status: "unpassed" },
+            { name: "张奥博", avatar: "dog", status: "unpassed" },
+            { name: "赵明轩", avatar: "cat", status: "unpassed" },
+            { name: "江佩霖", avatar: "bear", status: "unpassed" },
+            { name: "毛丹丹", avatar: "frog", status: "unpassed" },
+            { name: "哈昕扬", avatar: "pig", status: "passed" },
+            { name: "张丹", avatar: "king", status: "passed" },
+            { name: "周金", avatar: "king", status: "passed" },
+            { name: "向伟", avatar: "king", status: "passed" },
+            { name: "朱秉月", avatar: "king", status: "passed" },
+            { name: "刘耀冉", avatar: "king", status: "passed" },
+            { name: "皮臻琳", avatar: "frog", status: "passed" },
+            { name: "张梦瑶", avatar: "cat", status: "passed" }
+        ].map((s, i) => ({ id: i + 1, ...s }));
 
-      const leftGrid = document.getElementById("grid-left");
-      const rightGrid = document.getElementById("grid-right");
+        const leftGrid = document.getElementById("grid-left");
+        const rightGrid = document.getElementById("grid-right");
 
-      function shuffle(arr){
-        for(let i=arr.length-1;i>0;i--){
-          const j=Math.floor(Math.random()*(i+1));
-          [arr[i],arr[j]]=[arr[j],arr[i]];
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
         }
-      }
-      shuffle(students);
+        shuffle(students);
 
-      function render() {
-        leftGrid.innerHTML = "";
-        rightGrid.innerHTML = "";
-        students.forEach((s, idx) => {
-          const lSlot = document.createElement("div");
-          lSlot.className = "slot";
-          lSlot.dataset.idx = String(idx);
-          if (s.status === "unpassed") lSlot.appendChild(card(s));
-          leftGrid.appendChild(lSlot);
+        function render() {
+            leftGrid.innerHTML = "";
+            rightGrid.innerHTML = "";
+            students.forEach((s, idx) => {
+                const lSlot = document.createElement("div");
+                lSlot.className = "slot";
+                lSlot.dataset.idx = String(idx);
+                if (s.status === "unpassed") lSlot.appendChild(card(s));
+                leftGrid.appendChild(lSlot);
 
-          const rSlot = document.createElement("div");
-          rSlot.className = "slot";
-          rSlot.dataset.idx = String(idx);
-          if (s.status === "passed") rSlot.appendChild(card(s));
-          rightGrid.appendChild(rSlot);
+                const rSlot = document.createElement("div");
+                rSlot.className = "slot";
+                rSlot.dataset.idx = String(idx);
+                if (s.status === "passed") rSlot.appendChild(card(s));
+                rightGrid.appendChild(rSlot);
+            });
+            updateResponsive();
+        }
+
+        function card(s) {
+            const el = document.createElement("div");
+            el.className = "student";
+            el.dataset.id = String(s.id);
+            const name = document.createElement("div");
+            name.className = "name";
+            name.textContent = s.name;
+            const avatar = document.createElement("div");
+            avatar.className = "avatar";
+            const img = document.createElement("img");
+            img.alt = s.name;
+            img.src = avatarMap[s.avatar] || avatarMap.pig;
+            avatar.appendChild(img);
+            el.appendChild(name);
+            el.appendChild(avatar);
+            return el;
+        }
+
+        function flyToRight(el, s, idx) {
+            const start = el.getBoundingClientRect();
+            const targetSlot = rightGrid.querySelector(`.slot[data-idx="${idx}"]`);
+            const ghost = card(s);
+            ghost.style.opacity = "0";
+            targetSlot.appendChild(ghost);
+            const target = ghost.getBoundingClientRect();
+            targetSlot.removeChild(ghost);
+
+            const dx = target.left - start.left;
+            const dy = target.top - start.top;
+            const clone = el.cloneNode(true);
+            const w = start.width, h = start.height;
+            clone.classList.add("fly-clone");
+            clone.style.width = w + "px";
+            clone.style.height = h + "px";
+            clone.style.left = start.left + "px";
+            clone.style.top = start.top + "px";
+            clone.style.transform = "translate(0,0)";
+            clone.style.transition = "transform 1s cubic-bezier(0.22, 1, 0.36, 1)";
+            document.body.appendChild(clone);
+            void clone.offsetHeight;
+            clone.style.transform = `translate(${dx}px, ${dy}px)`;
+            clone.addEventListener("transitionend", () => {
+                clone.remove();
+                s.status = "passed";
+                render();
+            }, { once: true });
+        }
+
+        leftGrid.addEventListener("click", e => {
+            const el = e.target.closest(".student");
+            if (!el) return;
+            const slot = e.target.closest(".slot");
+            const idx = Number(slot?.dataset.idx ?? -1);
+            if (idx < 0) return;
+            const s = students[idx];
+            if (!s || s.status !== "unpassed") return;
+            flyToRight(el, s, idx);
         });
-        updateResponsive();
-      }
 
-      function card(s) {
-        const el = document.createElement("div");
-        el.className = "student";
-        el.dataset.id = String(s.id);
-        const name = document.createElement("div");
-        name.className = "name";
-        name.textContent = s.name;
-        const avatar = document.createElement("div");
-        avatar.className = "avatar";
-        const img = document.createElement("img");
-        img.alt = s.name;
-        img.src = avatarMap[s.avatar] || avatarMap.pig;
-        avatar.appendChild(img);
-        el.appendChild(name);
-        el.appendChild(avatar);
-        return el;
-      }
+        render();
 
-      function flyToRight(el, s, idx) {
-        const start = el.getBoundingClientRect();
-        const targetSlot = rightGrid.querySelector(`.slot[data-idx="${idx}"]`);
-        const ghost = card(s);
-        ghost.style.opacity = "0";
-        targetSlot.appendChild(ghost);
-        const target = ghost.getBoundingClientRect();
-        targetSlot.removeChild(ghost);
-
-        const dx = target.left - start.left;
-        const dy = target.top - start.top;
-        const clone = el.cloneNode(true);
-        const w = start.width, h = start.height;
-        clone.classList.add("fly-clone");
-        clone.style.width = w + "px";
-        clone.style.height = h + "px";
-        clone.style.left = start.left + "px";
-        clone.style.top = start.top + "px";
-        clone.style.transform = "translate(0,0)";
-        clone.style.transition = "transform 1s cubic-bezier(0.22, 1, 0.36, 1)";
-        document.body.appendChild(clone);
-        void clone.offsetHeight;
-        clone.style.transform = `translate(${dx}px, ${dy}px)`;
-        clone.addEventListener("transitionend", () => {
-          clone.remove();
-          s.status = "passed";
-          render();
-        }, { once: true });
-      }
-
-      leftGrid.addEventListener("click", e => {
-        const el = e.target.closest(".student");
-        if (!el) return;
-        const slot = e.target.closest(".slot");
-        const idx = Number(slot?.dataset.idx ?? -1);
-        if (idx < 0) return;
-        const s = students[idx];
-        if (!s || s.status !== "unpassed") return;
-        flyToRight(el, s, idx);
-      });
-
-      render();
-
-      function updateResponsive(){
-        const panel = document.getElementById("panel-left");
-        const width = panel.clientWidth;
-        const base = 120; // 目标最小单元宽度
-        let cols = Math.max(3, Math.min(8, Math.floor(width / base)));
-        document.documentElement.style.setProperty('--cols', String(cols));
-        const gap = 10;
-        const cellW = Math.max(70, Math.floor((width - (cols - 1) * gap - 32) / cols));
-        const size = Math.max(50, Math.min(84, cellW - 34));
-        document.documentElement.style.setProperty('--size', size + 'px');
-      }
-      window.addEventListener('resize', updateResponsive);
+        function updateResponsive() {
+            const panel = document.getElementById("panel-left");
+            const width = panel.clientWidth;
+            const base = 105; // 更紧凑的目标单元宽度
+            let cols = Math.max(3, Math.min(8, Math.floor(width / base)));
+            document.documentElement.style.setProperty('--cols', String(cols));
+            const gap = 8;
+            const cellW = Math.max(64, Math.floor((width - (cols - 1) * gap - 32) / cols));
+            const size = Math.max(42, Math.min(76, cellW - 28));
+            document.documentElement.style.setProperty('--size', size + 'px');
+        }
+        window.addEventListener('resize', updateResponsive);
     </script>
-  </body>
+</body>
+
 </html>
