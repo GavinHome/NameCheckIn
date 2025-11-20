@@ -97,7 +97,7 @@
         }
 
         .panel h2 {
-            margin: 6px 0 8px;
+            margin: 6px 0 12px;
             text-align: center;
             color: var(--red);
             font-size: clamp(18px, 3vw, 30px);
@@ -108,7 +108,7 @@
         .grid {
             display: grid;
             grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
-            gap: 12px var(--min-gap);
+            gap: 10px var(--min-gap);
             align-items: start;
         }
 
@@ -310,12 +310,11 @@
             });
             updateResponsive();
         }
-
-        function card(s) {
-            const el = document.createElement("div");
-            el.className = "student";
-            el.dataset.id = String(s.id);
-            const name = document.createElement("div");
+      function card(s) {
+        const el = document.createElement("div");
+        el.className = "student";
+        el.dataset.id = String(s.id);
+        const name = document.createElement("div");
             name.className = "name";
             name.textContent = s.name;
             const avatar = document.createElement("div");
@@ -327,7 +326,7 @@
             el.appendChild(name);
             el.appendChild(avatar);
             return el;
-        }
+      }
 
       function flyToRight(el, s, idx, leftSlot) {
         const start = el.getBoundingClientRect();
@@ -360,15 +359,57 @@
         }, { once: true });
       }
 
-        leftGrid.addEventListener("click", e => {
-            const el = e.target.closest(".student");
-            if (!el) return;
-            const slot = e.target.closest(".slot");
-            const idx = Number(slot?.dataset.idx ?? -1);
-            if (idx < 0) return;
-            const s = students[idx];
-            if (!s || s.status !== "unpassed") return;
+      function flyToLeft(el, s, idx, rightSlot) {
+        const start = el.getBoundingClientRect();
+        const targetSlot = leftGrid.querySelector(`.slot[data-idx="${idx}"]`);
+        const ghost = card(s);
+        ghost.style.opacity = "0";
+        targetSlot.appendChild(ghost);
+        const target = ghost.getBoundingClientRect();
+        targetSlot.removeChild(ghost);
+
+        const dx = target.left - start.left;
+        const dy = target.top - start.top;
+        const clone = el.cloneNode(true);
+        const w = start.width, h = start.height;
+        clone.classList.add("fly-clone");
+        clone.style.width = w + "px";
+        clone.style.height = h + "px";
+        clone.style.left = start.left + "px";
+        clone.style.top = start.top + "px";
+        clone.style.transform = "translate(0,0)";
+        clone.style.transition = "transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)";
+        document.body.appendChild(clone);
+        if (rightSlot) rightSlot.innerHTML = "";
+        void clone.offsetHeight;
+        clone.style.transform = `translate(${dx}px, ${dy}px)`;
+        clone.addEventListener("transitionend", () => {
+          clone.remove();
+          s.status = "unpassed";
+          render();
+        }, { once: true });
+      }
+
+      leftGrid.addEventListener("click", e => {
+        const el = e.target.closest(".student");
+        if (!el) return;
+        const slot = e.target.closest(".slot");
+        const idx = Number(slot?.dataset.idx ?? -1);
+        if (idx < 0) return;
+        const s = students[idx];
+        if (!s || s.status !== "unpassed") return;
         flyToRight(el, s, idx, slot);
+      });
+
+      rightGrid.addEventListener("dblclick", e => {
+        const el = e.target.closest(".student");
+        if (!el) return;
+        const slot = e.target.closest(".slot");
+        const idx = Number(slot?.dataset.idx ?? -1);
+        if (idx < 0) return;
+        const s = students[idx];
+        if (!s || s.status !== "passed") return;
+        flyToLeft(el, s, idx, slot);
       });
 
         render();
