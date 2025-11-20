@@ -327,35 +327,36 @@
             return el;
         }
 
-        function flyToRight(el, s, idx) {
-            const start = el.getBoundingClientRect();
-            const targetSlot = rightGrid.querySelector(`.slot[data-idx="${idx}"]`);
-            const ghost = card(s);
-            ghost.style.opacity = "0";
-            targetSlot.appendChild(ghost);
-            const target = ghost.getBoundingClientRect();
-            targetSlot.removeChild(ghost);
+      function flyToRight(el, s, idx, leftSlot) {
+        const start = el.getBoundingClientRect();
+        const targetSlot = rightGrid.querySelector(`.slot[data-idx="${idx}"]`);
+        const ghost = card(s);
+        ghost.style.opacity = "0";
+        targetSlot.appendChild(ghost);
+        const target = ghost.getBoundingClientRect();
+        targetSlot.removeChild(ghost);
 
             const dx = target.left - start.left;
             const dy = target.top - start.top;
-            const clone = el.cloneNode(true);
-            const w = start.width, h = start.height;
-            clone.classList.add("fly-clone");
-            clone.style.width = w + "px";
-            clone.style.height = h + "px";
-            clone.style.left = start.left + "px";
-            clone.style.top = start.top + "px";
-            clone.style.transform = "translate(0,0)";
-            clone.style.transition = "transform 1s cubic-bezier(0.22, 1, 0.36, 1)";
-            document.body.appendChild(clone);
-            void clone.offsetHeight;
-            clone.style.transform = `translate(${dx}px, ${dy}px)`;
-            clone.addEventListener("transitionend", () => {
-                clone.remove();
-                s.status = "passed";
-                render();
-            }, { once: true });
-        }
+        const clone = el.cloneNode(true);
+        const w = start.width, h = start.height;
+        clone.classList.add("fly-clone");
+        clone.style.width = w + "px";
+        clone.style.height = h + "px";
+        clone.style.left = start.left + "px";
+        clone.style.top = start.top + "px";
+        clone.style.transform = "translate(0,0)";
+        clone.style.transition = "transform 1s cubic-bezier(0.22, 1, 0.36, 1)";
+        document.body.appendChild(clone);
+        if (leftSlot) leftSlot.innerHTML = "";
+        void clone.offsetHeight;
+        clone.style.transform = `translate(${dx}px, ${dy}px)`;
+        clone.addEventListener("transitionend", () => {
+          clone.remove();
+          s.status = "passed";
+          render();
+        }, { once: true });
+      }
 
         leftGrid.addEventListener("click", e => {
             const el = e.target.closest(".student");
@@ -365,8 +366,8 @@
             if (idx < 0) return;
             const s = students[idx];
             if (!s || s.status !== "unpassed") return;
-            flyToRight(el, s, idx);
-        });
+        flyToRight(el, s, idx, slot);
+      });
 
         render();
 
