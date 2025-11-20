@@ -5,27 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>背诵任务打卡互动界面</title>
     <style>
-      :root { --bg:#f5f1d9; --panel:#eef5d6; --title:#111; --red:#c62828; --accent:#5c6bc0; }
+      :root { --bg:#f5f1d9; --panel:#eef5d6; --title:#111; --red:#c62828; --accent:#5c6bc0; --cols:7; --size:68px; --min-gap:10px; }
       * { box-sizing: border-box; }
       html, body { height: 100%; }
-      body { margin: 0; background: radial-gradient(ellipse at top, #f7f3e5 0%, #ede8cf 40%, #e6e1bd 100%); font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, -apple-system, sans-serif; color: var(--title); }
-      .wrap { max-width: 1200px; margin: 0 auto; padding: 16px; }
+      body { margin: 0; overflow-x: hidden; background: radial-gradient(ellipse at top, #f7f3e5 0%, #ede8cf 40%, #e6e1bd 100%); font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, -apple-system, sans-serif; color: var(--title); }
+      .wrap { width: 100%; margin: 0 auto; padding: 16px; }
       header { position: relative; display: flex; align-items: center; justify-content: center; padding: 16px 0 8px; }
       header h1 { font-size: clamp(24px, 4vw, 48px); font-weight: 800; letter-spacing: 2px; color: var(--title); text-align: center; }
       .pig-left, .pig-right { position: absolute; top: 4px; width: clamp(60px, 10vw, 100px); height: auto; }
       .pig-left { left: 12px; }
       .pig-right { right: 12px; }
 
-      .content { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .content { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; }
       .panel { background: var(--bg); border-radius: 24px; border: 4px solid #d7d2ae; padding: 12px 16px 20px; min-height: 55vh; position: relative; }
       .panel::after { content:""; position:absolute; inset:0; border-radius:24px; box-shadow: inset 0 8px 24px rgba(0,0,0,0.08); pointer-events:none; }
       .panel h2 { margin: 6px 0 12px; text-align: center; color: var(--red); font-size: clamp(18px, 3vw, 30px); font-weight: 800; letter-spacing: 2px; }
-      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 12px 10px; align-items: start; }
+      .grid { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 12px var(--min-gap); align-items: start; }
+      .slot { min-height: calc(var(--size) + 42px); display: flex; align-items: flex-start; justify-content: center; }
 
       .student { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 6px; border-radius: 16px; transition: transform .2s ease, box-shadow .2s ease; user-select: none; cursor: pointer; }
       .student:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0,0,0,0.12); }
-      .avatar { width: 68px; height: 68px; border-radius: 50%; background: #fff; display: grid; place-items: center; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
-      .name { font-size: 14px; font-weight: 700; color: #333; text-align: center; }
+      .avatar { width: var(--size); height: var(--size); border-radius: 50%; background: #fff; display: grid; place-items: center; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+      .avatar img { width: 100%; height: 100%; object-fit: contain; }
+      .name { font-size: clamp(12px, calc(var(--size) / 4.8), 16px); font-weight: 700; color: #333; text-align: center; }
 
       .empty { opacity: .5; text-align: center; padding: 24px; font-size: 14px; }
 
@@ -33,7 +35,7 @@
       .pulse { animation: pulse .9s ease-in-out infinite; }
       @keyframes pulse { 0%{ transform: scale(1);} 50%{ transform: scale(1.08);} 100%{ transform: scale(1);} }
 
-      @media (max-width: 860px) { .content { grid-template-columns: 1fr; } .panel { min-height: auto; } }
+      @media (max-width: 860px) { .panel { min-height: auto; } :root { --cols: 5; --size: clamp(52px, 9vw, 68px); } }
     </style>
   </head>
   <body>
@@ -110,15 +112,31 @@
       const leftGrid = document.getElementById("grid-left");
       const rightGrid = document.getElementById("grid-right");
 
+      function shuffle(arr){
+        for(let i=arr.length-1;i>0;i--){
+          const j=Math.floor(Math.random()*(i+1));
+          [arr[i],arr[j]]=[arr[j],arr[i]];
+        }
+      }
+      shuffle(students);
+
       function render() {
-        const left = students.filter(s => s.status === "unpassed");
-        const right = students.filter(s => s.status === "passed");
         leftGrid.innerHTML = "";
         rightGrid.innerHTML = "";
-        if (!left.length) leftGrid.innerHTML = `<div class="empty">暂无未过关同学</div>`;
-        if (!right.length) rightGrid.innerHTML = `<div class="empty">暂无已过关同学</div>`;
-        left.forEach(s => leftGrid.appendChild(card(s)));
-        right.forEach(s => rightGrid.appendChild(card(s)));
+        students.forEach((s, idx) => {
+          const lSlot = document.createElement("div");
+          lSlot.className = "slot";
+          lSlot.dataset.idx = String(idx);
+          if (s.status === "unpassed") lSlot.appendChild(card(s));
+          leftGrid.appendChild(lSlot);
+
+          const rSlot = document.createElement("div");
+          rSlot.className = "slot";
+          rSlot.dataset.idx = String(idx);
+          if (s.status === "passed") rSlot.appendChild(card(s));
+          rightGrid.appendChild(rSlot);
+        });
+        updateResponsive();
       }
 
       function card(s) {
@@ -132,7 +150,6 @@
         avatar.className = "avatar";
         const img = document.createElement("img");
         img.alt = s.name;
-        img.width = 68; img.height = 68;
         img.src = avatarMap[s.avatar] || avatarMap.pig;
         avatar.appendChild(img);
         el.appendChild(name);
@@ -140,13 +157,14 @@
         return el;
       }
 
-      function flyToRight(el, s) {
+      function flyToRight(el, s, idx) {
         const start = el.getBoundingClientRect();
+        const targetSlot = rightGrid.querySelector(`.slot[data-idx="${idx}"]`);
         const ghost = card(s);
         ghost.style.opacity = "0";
-        rightGrid.appendChild(ghost);
+        targetSlot.appendChild(ghost);
         const target = ghost.getBoundingClientRect();
-        rightGrid.removeChild(ghost);
+        targetSlot.removeChild(ghost);
 
         const dx = target.left - start.left;
         const dy = target.top - start.top;
@@ -172,13 +190,28 @@
       leftGrid.addEventListener("click", e => {
         const el = e.target.closest(".student");
         if (!el) return;
-        const id = Number(el.dataset.id);
-        const s = students.find(x => x.id === id);
+        const slot = e.target.closest(".slot");
+        const idx = Number(slot?.dataset.idx ?? -1);
+        if (idx < 0) return;
+        const s = students[idx];
         if (!s || s.status !== "unpassed") return;
-        flyToRight(el, s);
+        flyToRight(el, s, idx);
       });
 
       render();
+
+      function updateResponsive(){
+        const panel = document.getElementById("panel-left");
+        const width = panel.clientWidth;
+        const base = 120; // 目标最小单元宽度
+        let cols = Math.max(3, Math.min(8, Math.floor(width / base)));
+        document.documentElement.style.setProperty('--cols', String(cols));
+        const gap = 10;
+        const cellW = Math.max(70, Math.floor((width - (cols - 1) * gap - 32) / cols));
+        const size = Math.max(50, Math.min(84, cellW - 34));
+        document.documentElement.style.setProperty('--size', size + 'px');
+      }
+      window.addEventListener('resize', updateResponsive);
     </script>
   </body>
 </html>
